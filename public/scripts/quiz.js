@@ -1,4 +1,4 @@
-import { createFragment, ELEMENTS } from "./dom.js"
+import { createFragment, ELEMENTS } from "./dom.js";
 
 const {
   ARTICLE,
@@ -8,45 +8,64 @@ const {
   INPUT,
   LABLE,
   DIV,
-  BUTTON
-} = ELEMENTS
+  BUTTON,
+} = ELEMENTS;
 
 const fetchQuestion = () => {
-  return fetch("/quiz").then(x => x.json())
-}
+  return fetch("/quiz").then((x) => x.json());
+};
 
 const createOption = (value, i) => {
   return [
-    DIV, { class: "option" },
-    [
-      INPUT, { type: "radio", name: "response", id: `option-${i}`, value }
-    ],
-    [LABLE, { for: `option-${i}` }, value]
+    DIV,
+    { class: "option" },
+    [INPUT, { type: "radio", name: "response", id: `option-${i}`, value }],
+    [LABLE, { for: `option-${i}` }, value],
   ];
-}
+};
 
 const addQuestions = (container, { question, options, questionNumber }) => {
   const questionTemplate = [
-    ARTICLE, {},
+    ARTICLE,
+    {},
     [
-      FORM, {},
+      FORM,
+      {},
       [
-        FIELDSET, {},
+        FIELDSET,
+        {},
         [LEGEND, {}, `${questionNumber}. ${question}`],
         ...options.map(createOption),
         [BUTTON, {}, "NEXT"],
-      ]
-    ]
+      ],
+    ],
   ];
 
-  container.append(createFragment(...questionTemplate))
-}
+  container.append(createFragment(...questionTemplate));
+};
 
-const renderQuestion = (question) => {
-  const main = document.querySelector("main");
-  addQuestions(main, question);
-}
+const addListeners = (container) => {
+  console.log("listener");
+  const form = container.querySelector("form");
+  form.addEventListener("submit", (e) => {
+    const formData = new FormData(form);
+    e.preventDefault();
+    fetch("/submit-response", { method: "post", body: formData })
+      .then((x) => x.json())
+      .then((x) => {
+        const article = container.querySelector("article");
+        article.removeChild(form);
+        renderQuestion(container, x);
+      });
+  });
+};
+
+const renderQuestion = (container, question) => {
+  addQuestions(container, question);
+  addListeners(container);
+};
 
 window.onload = () => {
-  fetchQuestion().then(renderQuestion)
-}
+  const main = document.querySelector("main");
+  fetchQuestion().then((x) => renderQuestion(main, x));
+};

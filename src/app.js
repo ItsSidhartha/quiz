@@ -1,19 +1,20 @@
 import { Hono } from "hono";
-import { logger } from "hono/logger"
+import { logger } from "hono/logger";
 import { serveStatic } from "hono/deno";
 
-export const createApp = () => {
+export const createApp = (quiz) => {
   const app = new Hono();
   app.use(logger());
-  const quiz = {
-    question: "What is the longest River?",
-    options: ["Ganga", "Nile", "Amazon"],
-    questionNumber: 1
-  }
 
-  app.get("/quiz", (C) => C.json(quiz));
+  app.post("/submit-response", async (c) => {
+    // const res = await c.req.json();
+    // console.log(res);
+    return c.json(quiz);
+  });
 
-  app.get("*", serveStatic({ root: "public" }))
+  app.get("/quiz", (c) => c.json(quiz));
+
+  app.get("*", serveStatic({ root: "public" }));
 
   return app;
-}
+};
