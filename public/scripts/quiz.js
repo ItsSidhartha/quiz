@@ -11,12 +11,8 @@ const {
   BUTTON
 } = ELEMENTS
 
-const fetchQuestion = async () => {
-  return {
-    question: "1. What is the longest River?",
-    options: ["Ganga", "Nile", "Amazon"],
-    questionNumber: 1
-  }
+const fetchQuestion = () => {
+  return fetch("/quiz").then(x => x.json())
 }
 
 const createOption = (value, i) => {
@@ -26,7 +22,7 @@ const createOption = (value, i) => {
       INPUT, { type: "radio", name: "response", id: `option-${i}`, value }
     ],
     [LABLE, { for: `option-${i}` }, value]
-  ]
+  ];
 }
 
 const addQuestions = (container, { question, options, questionNumber }) => {
